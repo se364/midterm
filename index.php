@@ -7,6 +7,7 @@ error_reporting(E_ALL);
 session_start();
 
 require_once('vendor/autoload.php');
+require_once("model/data-layer.php");
 
 //F3 class
 $f3 = Base::instance();
@@ -19,37 +20,24 @@ $f3->route('GET /', function(){
     echo $view->render('views/home.html');
 }
 );
-$f3->route('GET|POST /survey', function ($f3) {
-    //echo "<h1>Hello World!</h1>";
+$f3->route('GET|POST /survey', function($f3) {
 
-    // Check if teh form has been posted
+    $conds = getOption();
+
+    //If the form has been submitted
     if($_SERVER['REQUEST_METHOD'] == 'POST') {
 
-        // validate the data
-        if (empty($_POST['pet'])) {
-            //Validate the data
-            echo 'Please supply a pet type';
+        //Store the data in the session array
+        $_SESSION['conds'] = $_POST['conds'];
 
-        } else {
-//        echo "get method";
-            //Data is valid
-            $_SESSION['pet'] = $_POST['pet'];
-
-            //Added color to the session
-            $_SESSION['color'] = $_POST['color'];
-//            $_SESSION['pet'] = $_POST['pet'];
-//            $_SESSION['pet'] = $_POST['pet'];
-//            $_SESSION['pet'] = $_POST['pet'];
-
-            //Redirect to the summary route
-            $f3->reroute('summary');
-        }
+        //Redirect to summary page
+        $f3->reroute('summary');
     }
-   // $f3->set('pet', $pet);
+
+    $f3->set('conds', $conds);
     $view = new Template();
-    echo $view->render("views/survey.html");
-}
-);
+    echo $view->render('views/survey.html');
+});
 
 $f3->route('GET /summary', function() {
     //echo '<h1>Thank you for your order!</h1>';
